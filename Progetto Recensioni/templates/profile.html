@@ -3,10 +3,18 @@
 {% block title %}Profile Page{% endblock %}
 
 {% block content %}
-
-<h1>{{ name }}</h1>
+{% with messages = get_flashed_messages() %}
+      {% if messages %}
+            {% for msg in messages %}
+                <p>{{msg}}</p>
+            {% endfor %}
+      {% endif %}
+  {% endwith %}
+<h1>{{session["user"]}}</h1>
 
 <button> <a class="nav-link" href="/logout"> Logout </a> </button>
 
 
-{% endblock %}
+
+
+{% endbl

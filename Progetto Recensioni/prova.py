@@ -4,31 +4,31 @@ from flask import Flask, redirect, url_for, render_template, session, request, f
 
 app = Flask(__name__)
 app.secret_key = "privatekey"  # chiave cript
-app.permanent_session_lifetime = timedelta(hours=1)
+#app.permanent_session_lifetime = timedelta(hours=1)
 
 
-@app.route("/")  # Base html per ogni pagina
+@app.route("/home")  # Base html per ogni pagina
 def home():
-    return render_template("base.html")
+        return render_template("Home.html")
 
 
 @app.route("/login", methods=["POST", "GET"])  # pagina di Login
 def login():
     if "POST" == request.method:  # se user si autentica e sessione non  è ancora aperta
         user = request.form["nm"]  # prelevo Username
+        password = request.form["pass"]
         session["user"] = user  # creazione nuova sessione
         flash("Hai effettuato con successo il login")
         return redirect(url_for("profile"))  # reindirizzo a pagine personale
     else:
         if "user" in session:
-            flash("Hai già effettuato il login")
-            return redirect(url_for("profile"))
+            return redirect(url_for("logout"))
 
         return render_template("login.html")  # se user non si è mai registrato rendero pagina Login
 
 
 @app.route("/user", methods=["POST", "GET"])
-def profile():  # funzione per pagina personale utente, passo come parametro username
+def profile():  # funzione per pagina personale utente
     email = None
     if "user" in session:  # se l'utente esiste e ha sessione aperta
         un = session["user"]  # prendo nome
@@ -51,11 +51,12 @@ def logout():
     if "user" in session:
         user = session["user"]
         flash(f"Hai effettuato il logout, {user}", "warning")
-
+   
     session.pop("user", None)
     session.pop("email", None)
-    return redirect(url_for("login"))
+    return redirect(url_for("home"))
 
 
 if __name__ == "__main__":
     app.run(debug=True)
+

@@ -1,25 +1,10 @@
 from datetime import timedelta
 
-from flask_sqlalchemy import SQLalchemy
 from flask import Flask, redirect, url_for, render_template, session, request, flash
 
 app = Flask(__name__)
 app.secret_key = "privatekey"  # chiave cript
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://users.sqlite3'
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.permanent_session_lifetime = timedelta(hours=1)
-
-db = sqlalchemy(app)
-
-
-class users(db.Model):
-    _id = db.Column("id", db.integer, primary_key=True)
-    name = db.Column(db.String(100))
-    password = db.Column(db.String(100))
-
-    def __init__(self, name, password):
-        self.name = name
-        self.password = password
 
 
 @app.route("/")  # Base html per ogni pagina
@@ -42,11 +27,20 @@ def login():
         return render_template("login.html")  # se user non si è mai registrato rendero pagina Login
 
 
-@app.route("/user")
+@app.route("/user", methods=["POST", "GET"])
 def profile():  # funzione per pagina personale utente, passo come parametro username
+    email = None
     if "user" in session:  # se l'utente esiste e ha sessione aperta
         un = session["user"]  # prendo nome
-        return render_template("profile.html")  # renderizzo pagina profilo
+
+        if request.method == "POST":
+            email = request.form["email"]
+            session["email"] = email
+            flash("Email salvata con successo")
+        else:
+            if "email" in session:
+                email = session["email"]
+        return render_template("profile.html", email=email)  # renderizzo pagina profilo
     else:
         flash("Non hai effettuato il login")
         return redirect(url_for("login"))  # altrimenti reindirizzo a pagina login
@@ -59,9 +53,9 @@ def logout():
         flash(f"Hai effettuato il logout, {user}", "warning")
 
     session.pop("user", None)
+    session.pop("email", None)
     return redirect(url_for("login"))
 
 
 if __name__ == "__main__":
-    db.create_all()
     app.run(debug=True)

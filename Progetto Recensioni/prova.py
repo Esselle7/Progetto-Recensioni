@@ -19,6 +19,9 @@ def login():
         password = request.form["pass"]
         session["user"] = user  # creazione nuova sessione
         flash("Hai effettuato con successo il login")
+        file = open("db_temp.txt", "a+")
+        file.write("username:"+str(user)+";"+"password:"+str(password)+"\n")
+        file.close()
         return redirect(url_for("profile"))  # reindirizzo a pagine personale
     else:
         if "user" in session:
@@ -51,7 +54,18 @@ def logout():
     if "user" in session:
         user = session["user"]
         flash(f"Hai effettuato il logout, {user}", "warning")
-   
+        output = []
+        file = open("db_temp.txt", "r+")
+        for riga in file:
+            array = riga.split(";")
+            username = array[0].split(":")
+            if session["user"] != username[1]:
+                output.append(riga)
+        file.close()
+        file = open("db_temp.txt", "w")
+        file.writelines(output)
+        file.close()
+        
     session.pop("user", None)
     session.pop("email", None)
     return redirect(url_for("home"))

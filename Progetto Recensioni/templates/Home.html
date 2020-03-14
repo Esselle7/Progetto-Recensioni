@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Home Page{% endblock %}
+
+{% block content %}
+<h6> Devo ancora farla la home</h6>
+
+
+{% endblock %}
+
+{% block new_com %}
+
+ {% if "user" in session %}
+
+
+<a class="nav-item nav-link" href="#">Nuovo Commento</a>
+
+<script>
+document.getElementById("Login").innerHTML = "Logout"
+</script>
+
+{% endif %}
+{% endblock %}
